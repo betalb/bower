@@ -498,5 +498,25 @@ describe('GitRemoteResolver', function () {
                 });
             });
         });
+
+        it('should support shallow cloning for git ssh urls', function (next) {
+            var testSource = 'git@foo/bar/baz.git';
+
+            var MyGitRemoteResolver = gitRemoteResolverFactory(
+                function (cmd, args, options) {
+                    return Q.all(['stdout', 'stderr']);
+                }
+            );
+
+            var resolver = new MyGitRemoteResolver({ source: testSource }, defaultConfig({ shallowCloneHosts: ['foo'] }), logger);
+
+            resolver._shallowClone().then(function (shallowCloningSupported) {
+                expect(shallowCloningSupported).to.be(true);
+
+                next();
+            }).catch(function (error) {
+                next(error);
+            });
+        });
     });
 });
